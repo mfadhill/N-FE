@@ -159,7 +159,10 @@ function Register() {
               <span className="text-xs text-gray-400 font-semibold">
                 Don't have an account?
               </span>
-              <a href="#" className="text-xs font-semibold text-purple-700">
+              <a
+                href="/auth/login"
+                className="text-xs font-semibold text-purple-700"
+              >
                 Sign up
               </a>
             </div>

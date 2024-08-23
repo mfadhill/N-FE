@@ -90,7 +90,7 @@ const Index = () => {
                 Belum punya akun register ?
               </span>
               <a
-                href="/register"
+                href="/auth/register"
                 className="text-xs ml-2 font-bold text-red-500"
               >
                 di sini
