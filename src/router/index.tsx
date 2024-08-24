@@ -7,6 +7,7 @@ import Akun from "../pages/Akun";
 import Login from "../pages/auth/login";
 import Register from "../pages/auth/register";
 import AuthLayout from "../layout/AuthLayout";
+import EditProfile from "../pages/Akun/EditProfile";
 
 const routes: RouteObject[] = [
   {
@@ -28,6 +29,10 @@ const routes: RouteObject[] = [
       {
         path: "/akun",
         element: <Akun />,
+      },
+      {
+        path: "/editprofile",
+        element: <EditProfile />,
       },
     ],
   },

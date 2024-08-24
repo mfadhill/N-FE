@@ -37,37 +37,37 @@ const Index = () => {
         <h1 className="font-bold text-3xl">Nominal Top Up</h1>
       </div>
       <div className="flex mt-10 flex-wrap justify-center">
-        <div className="flex flex-col p-4" style={{ flexBasis: "60%" }}>
+        <div className="flex flex-col mx-4" style={{ flexBasis: "60%" }}>
           <input
             type="text"
-            placeholder="Enter text"
+            placeholder="Masukkan Nominal Top up"
             className="mb-4 w-full px-3 py-2 border rounded-md border-gray-300"
           />
-          <button className="bg-blue-500 text-white w-full py-2 rounded-md mb-2 hover:bg-blue-700">
-            Submit
+          <button className="bg-gray-400 text-white w-full py-2 rounded-md mb-2 hover:bg-gray-700">
+            Top Up
           </button>
         </div>
         <div
-          className="bg-blue-500 flex flex-wrap"
-          style={{ flexBasis: "40%" }}
+          className="flex flex-wrap justify-between"
+          style={{ width: "390px" }}
         >
-          <button className="bg-blue-500 text-white w-1/3 py-2 rounded-md mb-2 hover:bg-blue-700">
-            Submit
+          <button className="border border-gray-500 text-gray-500 w-32 py-2 h-12 rounded-md mb-2 hover:bg-gray-200">
+            Rp. 10.000
           </button>
-          <button className="bg-blue-500 text-white w-1/3 py-2 rounded-md mb-2 hover:bg-blue-700">
-            Submit
+          <button className="border border-gray-500 text-gray-500 w-32 py-2 h-12 rounded-md mb-2 hover:bg-gray-200">
+            Rp. 20.000
           </button>
-          <button className="bg-blue-500 text-white w-1/3 py-2 rounded-md mb-2 hover:bg-blue-700">
-            Submit
+          <button className="border border-gray-500 text-gray-500 w-32 py-2 h-12 rounded-md mb-2 hover:bg-gray-200">
+            Rp. 50.000
           </button>
-          <button className="bg-blue-500 text-white w-1/3 py-2 rounded-md mb-2 hover:bg-blue-700">
-            Submit
+          <button className="border border-gray-500 text-gray-500 w-32 py-2 h-12 rounded-md mb-2 hover:bg-gray-200">
+            Rp. 100.000
           </button>
-          <button className="bg-blue-500 text-white w-1/3 py-2 rounded-md mb-2 hover:bg-blue-700">
-            Submit
+          <button className="border border-gray-500 text-gray-500 w-32 py-2 h-12 rounded-md mb-2 hover:bg-gray-200">
+            Rp. 250.000
           </button>
-          <button className="bg-blue-500 text-white w-1/3 py-2 rounded-md mb-2 hover:bg-blue-700">
-            Submit
+          <button className="border border-gray-500 text-gray-500 w-32 py-2 h-12 rounded-md mb-2 hover:bg-gray-200">
+            Rp. 500.000
           </button>
         </div>
       </div>

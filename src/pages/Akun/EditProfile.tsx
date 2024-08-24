@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import profile from "../../assets/profile.png";
 import { MdOutlineModeEdit } from "react-icons/md";
-import { Link } from "react-router-dom";
 
 const Index = () => {
   const [email, setEmail] = useState("");
@@ -96,14 +95,6 @@ const Index = () => {
             required
           />
         </div>
-        <Link to="/editprofile">
-          <button
-            type="button"
-            className="bg-white mt-4 border border-red-500 text-red-500 px-4 py-2 rounded-md w-full hover:bg-red-500 hover:text-white"
-          >
-            Edit Profile
-          </button>
-        </Link>
         <button
           type="button"
           className="bg-red-500 text-white px-4 py-2 rounded-md w-full hover:bg-red-900"
@@ -116,3 +107,4 @@ const Index = () => {
 };
 
 export default Index;
+
