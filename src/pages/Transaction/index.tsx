@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import profile from "../../assets/profile.png";
 import psaldo from "../../assets/saldo.png";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"; // Import icons
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const Index = () => {
   const [visibleCount, setVisibleCount] = useState(5);
-  const [isSaldoVisible, setIsSaldoVisible] = useState(true); // State to manage saldo visibility
+  const [isSaldoVisible, setIsSaldoVisible] = useState(true); 
 
   const transactions = [
     {

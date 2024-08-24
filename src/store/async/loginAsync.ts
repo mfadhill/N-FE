@@ -1,30 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { API, setAuthToken } from "../../lib/api";
 import axios from "axios";
+import { IUser } from "../../types/app";
 
 export interface Ilogin {
     email: string;
     password: string;
 }
-
-// export const loginAsync = createAsyncThunk<
-//     string,
-//     Ilogin,
-//     { rejectValue: string }
-// >("/login", async (props, { rejectWithValue }) => {
-//     try {
-//         console.log("props", props);
-//         const { data } = await axios.post("https://take-home-test-api.nutech-integrasi.com/login", props);
-
-//         console.log("data", data.token);
-//         const token = data.token;
-//         localStorage.setItem("token", token);
-
-//         return token;
-//     } catch (error) {
-//         return rejectWithValue("error");
-//     }
-// });
 
 export const loginAsync = createAsyncThunk<
     string,

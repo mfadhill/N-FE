@@ -2,12 +2,26 @@ import React, { useState } from "react";
 import profile from "../../assets/profile.png";
 import psaldo from "../../assets/saldo.png";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+
 const Index = () => {
   const [isSaldoVisible, setIsSaldoVisible] = useState(true);
+  const [topUpAmount, setTopUpAmount] = useState(""); // State for the input value
 
+  // Toggle saldo visibility
   const toggleSaldoVisibility = () => {
     setIsSaldoVisible((prevState) => !prevState);
   };
+
+  // Update input value
+  const handleInputChange = (e: any) => {
+    setTopUpAmount(e.target.value);
+  };
+
+  // Set input value when a button is clicked
+  const handleButtonClick = (amount: string) => {
+    setTopUpAmount(amount);
+  };
+
   return (
     <div className="mt-4 mx-auto max-w-7xl">
       <div className="flex justify-center items-center space-x-4">
@@ -51,7 +65,7 @@ const Index = () => {
         </div>
       </div>
 
-      <div className=" ml-5 mt-4">
+      <div className="ml-5 mt-4">
         <h1>Silahkan Masukan</h1>
         <h1 className="font-bold text-3xl">Nominal Top Up</h1>
       </div>
@@ -59,6 +73,8 @@ const Index = () => {
         <div className="flex flex-col mx-4" style={{ flexBasis: "60%" }}>
           <input
             type="number"
+            value={topUpAmount}
+            onChange={handleInputChange}
             placeholder="Masukkan Nominal Top up"
             className="mb-4 w-full px-3 py-2 border rounded-md border-gray-300"
           />
@@ -70,24 +86,17 @@ const Index = () => {
           className="flex flex-wrap justify-between"
           style={{ width: "390px" }}
         >
-          <button className="border border-gray-500 text-gray-500 w-32 py-2 h-11 rounded-md mb-2 hover:bg-gray-200">
-            Rp. 10.000
-          </button>
-          <button className="border border-gray-500 text-gray-500 w-32 py-2 h-11 rounded-md mb-2 hover:bg-gray-200">
-            Rp. 20.000
-          </button>
-          <button className="border border-gray-500 text-gray-500 w-32 py-2 h-11 rounded-md mb-2 hover:bg-gray-200">
-            Rp. 50.000
-          </button>
-          <button className="border border-gray-500 text-gray-500 w-32 py-2 h-11 rounded-md mb-2 hover:bg-gray-200">
-            Rp. 100.000
-          </button>
-          <button className="border border-gray-500 text-gray-500 w-32 py-2 h-11 rounded-md mb-2 hover:bg-gray-200">
-            Rp. 250.000
-          </button>
-          <button className="border border-gray-500 text-gray-500 w-32 py-2 h-11 rounded-md mb-2 hover:bg-gray-200">
-            Rp. 500.000
-          </button>
+          {["10.000", "20.000", "50.000", "100.000", "250.000", "500.000"].map(
+            (amount) => (
+              <button
+                key={amount}
+                onClick={() => handleButtonClick(amount)}
+                className="border border-gray-500 text-gray-500 w-32 py-2 h-11 rounded-md mb-2 hover:bg-gray-200"
+              >
+                Rp. {amount}
+              </button>
+            )
+          )}
         </div>
       </div>
     </div>

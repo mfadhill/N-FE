@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import profile from "../../assets/profile.png";
 import psaldo from "../../assets/saldo.png";
 import Game from "../../assets/icon/Game.png";
@@ -18,8 +18,37 @@ import Ban2 from "../../assets/banner/Banner2.png";
 import Ban3 from "../../assets/banner/Banner3.png";
 import Ban4 from "../../assets/banner/Banner4.png";
 import Ban5 from "../../assets/banner/Banner5.png";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { fetchProfile } from "../../store/slice/getProfileSlice";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 
 const Index = () => {
+  const dispatch = useAppDispatch();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        await dispatch(fetchProfile());
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [dispatch]);
+
+  // Safe access to profile state
+  const profileState = useAppSelector((state) => state.profile.data);
+  const data = profileState ? profileState.data : null;
+
+  const [isSaldoVisible, setIsSaldoVisible] = useState(true);
+  const toggleSaldoVisibility = () => {
+    setIsSaldoVisible((prev) => !prev);
+  };
+
   return (
     <div className="mt-4 mx-auto max-w-7xl">
       <div className="flex justify-center items-center space-x-4">
@@ -31,7 +60,16 @@ const Index = () => {
           />
           <div className="mt-4 text-center">
             <h1>Selamat Datang</h1>
-            <h1 className="font-bold text-3xl">Kristina Wibowo</h1>
+            {loading ? (
+              <p>Loading...</p>
+            ) : data ? (
+              <>
+                <h1 className="font-bold text-3xl">{data.first_name}</h1>
+                <h1 className="font-bold text-3xl">{data.last_name}</h1>
+              </>
+            ) : (
+              <p>No data available</p>
+            )}
           </div>
         </div>
 
@@ -43,11 +81,24 @@ const Index = () => {
           />
           <div className="relative z-10 flex flex-col h-full pl-6">
             <h1 className="text-white font-semibold mt-6">Saldo Anda</h1>
-            <h1 className="text-white text-4xl font-bold mt-2">Rp 100.000</h1>
-            <h1 className="text-white font-semibold mt-5">Lihat Saldo</h1>
+            <h1 className="text-white text-4xl font-bold mt-2">
+              {isSaldoVisible ? "Rp 100.000" : "****"}
+            </h1>
+            <button
+              onClick={toggleSaldoVisibility}
+              className="text-white font-semibold mt-5 flex items-center space-x-2"
+            >
+              <span>{isSaldoVisible ? "Lihat Saldo" : "Lihat Saldo"}</span>
+              {isSaldoVisible ? (
+                <AiOutlineEyeInvisible className="text-white" />
+              ) : (
+                <AiOutlineEye className="text-white" />
+              )}
+            </button>
           </div>
         </div>
       </div>
+
       {/* icon */}
       <div className="flex mt-10 flex-wrap justify-center">
         <img src={Game} alt="" className="mx-4 mb-4" />

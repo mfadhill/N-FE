@@ -3,10 +3,12 @@ import { useDispatch, TypedUseSelectorHook, useSelector } from "react-redux";
 // import customerReducer from "./Slice/allCustomerSlice";
 // import getTotalReducer from "./Slice/getTotalSlice";
 import authReducer from "./slice/authSlice";
+import getProfileReducer from "./slice/getProfileSlice";
 
 const store = configureStore({
     reducer: {
         auth: authReducer,
+        profile: getProfileReducer,
         // customer: customerReducer,
         // getTotal: getTotalReducer,
     }
