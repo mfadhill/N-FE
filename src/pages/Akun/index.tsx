@@ -2,6 +2,8 @@ import React, { useState, useRef } from "react";
 import profile from "../../assets/profile.png";
 import { MdOutlineModeEdit } from "react-icons/md";
 import { Link } from "react-router-dom";
+import { logoutAsync } from "../../store/async/loginAsync";
+import { useAppDispatch } from "../../store/store";
 
 const Index = () => {
   const [email, setEmail] = useState("");
@@ -9,7 +11,7 @@ const Index = () => {
   const [lastName, setLastName] = useState("");
   const [profilePic, setProfilePic] = useState(profile); // Initial profile image
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const dispatch = useAppDispatch();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log({ email, firstName, lastName });
@@ -104,11 +106,13 @@ const Index = () => {
             Edit Profile
           </button>
         </Link>
+
         <button
           type="button"
+          onClick={(e) => dispatch(logoutAsync())}
           className="bg-red-500 text-white px-4 py-2 rounded-md w-full hover:bg-red-900"
         >
-          Simpan
+          Logout
         </button>
       </form>
     </div>

@@ -1,33 +1,55 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { API, setAuthToken } from "../../lib/api";
+import axios from "axios";
 
 export interface Ilogin {
     email: string;
     password: string;
 }
 
+// export const loginAsync = createAsyncThunk<
+//     string,
+//     Ilogin,
+//     { rejectValue: string }
+// >("/login", async (props, { rejectWithValue }) => {
+//     try {
+//         console.log("props", props);
+//         const { data } = await axios.post("https://take-home-test-api.nutech-integrasi.com/login", props);
+
+//         console.log("data", data.token);
+//         const token = data.token;
+//         localStorage.setItem("token", token);
+
+//         return token;
+//     } catch (error) {
+//         return rejectWithValue("error");
+//     }
+// });
+
 export const loginAsync = createAsyncThunk<
     string,
     Ilogin,
     { rejectValue: string }
->("auth/login", async (props, { rejectWithValue }) => {
+>("/login", async (props, { rejectWithValue }) => {
     try {
         console.log("props", props);
-        const { data } = await API.post("/login", props);
+        const response = await axios.post("https://take-home-test-api.nutech-integrasi.com/login", props);
 
-        console.log("data", data.token);
-        const token = data.token;
+        console.log("response data", response.data);
+
+        const token = response.data.data.token;
         localStorage.setItem("token", token);
 
         return token;
     } catch (error) {
-        return rejectWithValue("error");
+        console.error("Login error:", error);
+        return rejectWithValue("Login failed");
     }
 });
 
-export const checkAuth = createAsyncThunk<IUser, void, { rejectValue: string }>("auth/profile", async (_, { rejectWithValue }) => {
+export const checkAuth = createAsyncThunk<IUser, void, { rejectValue: string }>("/profile", async (_, { rejectWithValue }) => {
     try {
-        const { data } = await API.get("/auth/check", {
+        const { data } = await API.get("/profile", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`
             }

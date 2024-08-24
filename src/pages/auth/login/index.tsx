@@ -2,30 +2,14 @@ import React, { useState } from "react";
 import image from "../../../assets/log.png";
 import { CiWallet } from "react-icons/ci";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import useLoginForm from "../hooks/useLoginForm"; // Sesuaikan path
 
 const Index = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const { formData, handleChange, handleSubmit } = useLoginForm();
   const [showPassword, setShowPassword] = useState(false);
-
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
-  };
-
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted:", formData);
   };
 
   return (
@@ -80,7 +64,7 @@ const Index = () => {
                   type="submit"
                   className="w-full text-center text-white bg-red-500 hover:bg-red-700 px-4 py-2 rounded-md"
                 >
-                  Registrasi
+                  Login
                 </button>
               </div>
             </form>

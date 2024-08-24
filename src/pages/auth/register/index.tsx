@@ -11,7 +11,7 @@ function Register() {
     first_name: "",
     last_name: "",
     password: "",
-    confirmPassword: "", // Menambahkan confirmPassword di sini
+    confirmPassword: "",
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -86,6 +86,16 @@ function Register() {
                 Lengkapi data untuk <br /> membuat akun
               </h1>
             </div>
+            {success && (
+              <div className="mt-4 text-green-500 text-xs font-semibold">
+                {success}
+              </div>
+            )}
+            {error && (
+              <div className="mt-4 text-red-500 text-xs font-semibold">
+                {error}
+              </div>
+            )}
 
             <form className="mt-6" onSubmit={handleSubmit}>
               <div className="mb-6">
@@ -165,17 +175,6 @@ function Register() {
                 </button>
               </div>
             </form>
-
-            {error && (
-              <div className="mt-4 text-red-500 text-xs font-semibold">
-                {error}
-              </div>
-            )}
-            {success && (
-              <div className="mt-4 text-green-500 text-xs font-semibold">
-                {success}
-              </div>
-            )}
 
             <div className="text-center mt-4">
               <span className="text-xs text-gray-400 font-semibold">
