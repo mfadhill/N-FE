@@ -3,18 +3,21 @@ import axios from "axios";
 import { CiWallet } from "react-icons/ci";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import image from "../../../assets/log.png";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
     email: "",
+    first_name: "",
+    last_name: "",
     password: "",
-    confirmPassword: "",
+    confirmPassword: "", // Menambahkan confirmPassword di sini
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -26,25 +29,44 @@ function Register() {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    // Basic validation
+    if (
+      !formData.email ||
+      !formData.first_name ||
+      !formData.last_name ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
+      setError("All fields are required.");
+      return;
+    }
+
+    // Password confirmation check
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      setSuccess("");
+      setError("Passwords do not match.");
       return;
     }
 
     try {
       const response = await axios.post(
-        "https://api-doc-tht.nutech-integrasi.com/register",
+        "https://take-home-test-api.nutech-integrasi.com/registration",
         formData
       );
-      setSuccess("Registration successful!");
-      setError("");
-      // You can also redirect the user or clear the form if needed
-    } catch (err) {
-      setError("Registration failed. Please try again.");
-      setSuccess("");
+      setSuccess("Registration successful! Redirecting...");
+      setTimeout(() => navigate("/auth/login"), 2000);
+    } catch (error: any) {
+      if (error.response && error.response.data) {
+        setError(
+          error.response.data.message ||
+            "Registration failed. Please try again."
+        );
+      } else {
+        setError("Registration failed. Please try again.");
+      }
+      console.error(error);
     }
   };
 
@@ -79,10 +101,10 @@ function Register() {
               <div className="mb-6">
                 <input
                   type="text"
-                  name="firstName"
-                  value={formData.firstName}
+                  name="first_name"
+                  value={formData.first_name}
                   onChange={handleChange}
-                  placeholder="nama depan"
+                  placeholder="Nama Depan"
                   className="block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500"
                 />
               </div>
@@ -90,10 +112,10 @@ function Register() {
               <div className="mb-6">
                 <input
                   type="text"
-                  name="lastName"
-                  value={formData.lastName}
+                  name="last_name"
+                  value={formData.last_name}
                   onChange={handleChange}
-                  placeholder="nama belakang"
+                  placeholder="Nama Belakang"
                   className="block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500"
                 />
               </div>
@@ -104,7 +126,7 @@ function Register() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="buat password"
+                  placeholder="Buat Password"
                   className="block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500"
                 />
                 <button
@@ -120,9 +142,9 @@ function Register() {
                 <input
                   type={showPassword ? "text" : "password"}
                   name="confirmPassword"
-                  value={formData.confirmPassword}
+                  value={formData.confirmPassword || ""}
                   onChange={handleChange}
-                  placeholder="konfirmasi password"
+                  placeholder="Konfirmasi Password"
                   className="block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500"
                 />
                 <button
@@ -157,13 +179,13 @@ function Register() {
 
             <div className="text-center mt-4">
               <span className="text-xs text-gray-400 font-semibold">
-                Don't have an account?
+                Already have an account?
               </span>
               <a
                 href="/auth/login"
                 className="text-xs font-semibold text-purple-700"
               >
-                Sign up
+                Sign in
               </a>
             </div>
           </div>
@@ -172,6 +194,7 @@ function Register() {
           <img
             className="w-full h-full bg-center bg-no-repeat bg-cover rounded-r-md"
             src={image}
+            alt="Registration Background"
           />
         </div>
       </div>

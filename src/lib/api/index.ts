@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const API = axios.create({
-    baseURL: "http://localhost:3000",
+    baseURL: "https://take-home-test-api.nutech-integrasi.com",
 });
 
 export const setAuthToken = (token?: string) => {
