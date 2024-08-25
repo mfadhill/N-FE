@@ -6,16 +6,20 @@ import { FaMoneyCheckDollar } from "react-icons/fa6";
 import { getBalance } from "../../store/slice/getBalanceSlice";
 import { fetchProfile } from "../../store/slice/getProfileSlice";
 import { useAppDispatch, useAppSelector } from "../../store/store";
+import axios from "axios";
 
 const Index: React.FC = () => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
   const [isSaldoVisible, setIsSaldoVisible] = useState(true);
+  const [nominal, setNominal] = useState("");
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const profileState = useAppSelector((state) => state.profile.data);
   const balanceState = useAppSelector((state) => state.balance);
   const profileData = profileState ? profileState.data : null;
   const balance = balanceState.data?.data?.balance ?? null;
-
   const selectedService = useAppSelector(
     (state) => state.services.selectedService
   );
@@ -26,6 +30,21 @@ const Index: React.FC = () => {
 
   const toggleSaldoVisibility = () => {
     setIsSaldoVisible((prevState) => !prevState);
+  };
+
+  const SERVICE_ICON: { [key: string]: string } = {
+    PAJAK: "/icon/PBB.png",
+    PLN: "/icon/Listrik.png",
+    PDAM: "/icon/PDAM.png",
+    PULSA: "/icon/Pulsa.png",
+    PGN: "/icon/PGN.png",
+    MUSIK: "/icon/Musik.png",
+    TV: "/icon/Televisi.png",
+    PAKET_DATA: "/icon/paket.png",
+    VOUCHER_GAME: "/icon/Game.png",
+    VOUCHER_MAKANAN: "/icon/makanan.png",
+    QURBAN: "/icon/Kurban.png",
+    ZAKAT: "/icon/Zakat.png",
   };
 
   useEffect(() => {
@@ -41,6 +60,34 @@ const Index: React.FC = () => {
     };
     loadData();
   }, [dispatch]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSuccessMessage(null);
+    setErrorMessage(null);
+
+    try {
+      const response = await axios.post(
+        "https://take-home-test-api.nutech-integrasi.com/transaction",
+        {
+          nominal: parseFloat(nominal),
+          service_code: selectedService.service_code,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Transaction successful:", response.data);
+      setSuccessMessage("Transaction successful!");
+      await dispatch(getBalance());
+    } catch (error) {
+      console.error("Transaction failed:", error);
+      setErrorMessage("Transaction failed. Please try again.");
+    }
+  };
 
   return (
     <div className="mt-4 mx-auto max-w-7xl px-4">
@@ -102,35 +149,54 @@ const Index: React.FC = () => {
 
       <div className="ml-5 mt-4">
         <h1 className="text-xl font-semibold">Pembayaran</h1>
-        <div className="mt-2 p-4 border border-gray-300 rounded-lg">
+        <div className="flex items-center mt-2">
+          <img
+            src={
+              SERVICE_ICON[selectedService.service_code] ||
+              selectedService.service_icon
+            }
+            className="w-14 h-14"
+          />
           <h2 className="text-lg font-medium">
             {selectedService.service_name}
           </h2>
-          <img
-            src={selectedService.service_icon}
-            alt={selectedService.service_name}
-            className="w-16 h-16 mt-2"
-          />
-          <p className="text-sm">
-            Tariff: Rp {selectedService.service_tariff.toLocaleString()}
-          </p>
         </div>
       </div>
 
       <div className="flex flex-col w-full px-5 mt-4">
-        <div className="relative w-full mb-4">
-          <input
-            type="text"
-            placeholder="Masukkan Nominal Top Up"
-            className="w-full px-10 py-2 border rounded-md border-gray-300"
-          />
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-            <FaMoneyCheckDollar className="text-gray-500" />
-          </span>
-        </div>
-        <button className="bg-red-600 text-white w-full py-2 rounded-md mb-2 hover:bg-red-700">
-          Bayar
-        </button>
+        <form onSubmit={handleSubmit}>
+          <div className="relative w-full mb-4">
+            <input
+              type="number"
+              id="nominal"
+              name="nominal"
+              placeholder={selectedService.service_tariff.toLocaleString()}
+              value={nominal}
+              onChange={(e) => setNominal(e.target.value)}
+              className="w-full px-10 py-2 border rounded-md border-gray-300"
+            />
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+              <FaMoneyCheckDollar className="text-gray-500" />
+            </span>
+          </div>
+          <button
+            type="submit"
+            className="bg-red-600 text-white w-full py-2 rounded-md mb-2 hover:bg-red-700"
+          >
+            Bayar
+          </button>
+        </form>
+        {/* Notification messages */}
+        {successMessage && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded font-bold relative mb-4">
+            {successMessage}
+          </div>
+        )}
+        {errorMessage && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+            {errorMessage}
+          </div>
+        )}
       </div>
     </div>
   );

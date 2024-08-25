@@ -63,6 +63,6 @@ const servicesSlice = createSlice({
     }
 });
 
-export const { setSelectedService } = servicesSlice.actions;
+export const { setSelectedService } = servicesSlice.actions; //untuk menyimpan data redux
 
 export default servicesSlice.reducer;
