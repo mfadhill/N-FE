@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { checkAuth, loginAsync, logoutAsync } from "../async/loginAsync";
+import { IUser } from "../../types/app";
 
 const storedToken = localStorage.getItem('token');
 const initialIsLogin = storedToken ? true : false;

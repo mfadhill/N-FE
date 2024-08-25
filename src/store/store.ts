@@ -1,16 +1,18 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, TypedUseSelectorHook, useSelector } from "react-redux";
-// import customerReducer from "./Slice/allCustomerSlice";
-// import getTotalReducer from "./Slice/getTotalSlice";
 import authReducer from "./slice/authSlice";
 import getProfileReducer from "./slice/getProfileSlice";
+import getBannerReducer from "./slice/getBannerSlice";
+import getServicesReducer from "./slice/getServicesSlice";
+import getBalanceReducer from "./slice/getBalanceSlice";
 
 const store = configureStore({
     reducer: {
         auth: authReducer,
         profile: getProfileReducer,
-        // customer: customerReducer,
-        // getTotal: getTotalReducer,
+        banner: getBannerReducer,
+        services: getServicesReducer,
+        balance: getBalanceReducer,
     }
 });
 

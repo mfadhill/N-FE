@@ -1,11 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import profile from "../../assets/profile.png";
 import psaldo from "../../assets/saldo.png";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { fetchProfile } from "../../store/slice/getProfileSlice";
+import { getBalance } from "../../store/slice/getBalanceSlice";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 
 const Index = () => {
   const [visibleCount, setVisibleCount] = useState(5);
-  const [isSaldoVisible, setIsSaldoVisible] = useState(true); 
+  const [isSaldoVisible, setIsSaldoVisible] = useState(true);
+  const dispatch = useAppDispatch();
+  const [loading, setLoading] = useState(true);
+  const balanceState = useAppSelector((state) => state.balance);
+  const balance = balanceState.data?.data?.balance ?? null;
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        await dispatch(fetchProfile());
+        await dispatch(getBalance());
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [dispatch]);
+
+  const profileState = useAppSelector((state) => state.profile.data);
+  const data = profileState ? profileState.data : null;
 
   const transactions = [
     {
@@ -79,7 +103,16 @@ const Index = () => {
           />
           <div className="mt-4 text-center">
             <h1>Selamat Datang</h1>
-            <h1 className="font-bold text-3xl">Kristina Wibowo</h1>
+            {loading ? (
+              <p>Loading...</p>
+            ) : data ? (
+              <div className="flex items-center space-x-2">
+                <h1 className="font-bold text-xl">{data.first_name}</h1>
+                <h1 className="font-bold text-xl">{data.last_name}</h1>
+              </div>
+            ) : (
+              <p>No data available</p>
+            )}
           </div>
         </div>
 
@@ -92,13 +125,21 @@ const Index = () => {
           <div className="relative z-10 flex flex-col h-full pl-6">
             <h1 className="text-white font-semibold mt-6">Saldo Anda</h1>
             <h1 className="text-white text-4xl font-bold mt-2">
-              {isSaldoVisible ? "Rp 100.000" : "****"}
+              {loading
+                ? "Loading..."
+                : isSaldoVisible
+                ? `Rp ${
+                    typeof balance === "number" ? balance.toLocaleString() : "0"
+                  }`
+                : "****"}
             </h1>
             <button
               onClick={toggleSaldoVisibility}
               className="text-white font-semibold mt-5 flex items-center space-x-2"
             >
-              <span>{isSaldoVisible ? "Lihat Saldo" : "Lihat Saldo"}</span>
+              <span>
+                {isSaldoVisible ? "Sembunyikan Saldo" : "Lihat Saldo"}
+              </span>
               {isSaldoVisible ? (
                 <AiOutlineEyeInvisible className="text-white" />
               ) : (

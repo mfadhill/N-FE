@@ -1,37 +1,27 @@
 import React, { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { fetchProfile } from "../../store/slice/getProfileSlice";
+import { getBanner } from "../../store/slice/getBannerSlice";
+import { getServices } from "../../store/slice/getServicesSlice";
+import { getBalance } from "../../store/slice/getBalanceSlice";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import profile from "../../assets/profile.png";
 import psaldo from "../../assets/saldo.png";
-import Game from "../../assets/icon/Game.png";
-import kurban from "../../assets/icon/Kurban.png";
-import Listrik from "../../assets/icon/Listrik.png";
-import Pdam from "../../assets/icon/PDAM.png";
-import makanan from "../../assets/icon/makanan.png";
-import Musik from "../../assets/icon/Musik.png";
-import Paket from "../../assets/icon/Paket.png";
-import PBB from "../../assets/icon/PBB.png";
-import PGN from "../../assets/icon/PGN.png";
-import Pulsa from "../../assets/icon/pulsa.png";
-import Televisi from "../../assets/icon/Televisi.png";
-import Zakat from "../../assets/icon/Zakat.png";
-import Ban1 from "../../assets/banner/Banner1.png";
-import Ban2 from "../../assets/banner/Banner2.png";
-import Ban3 from "../../assets/banner/Banner3.png";
-import Ban4 from "../../assets/banner/Banner4.png";
-import Ban5 from "../../assets/banner/Banner5.png";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { fetchProfile } from "../../store/slice/getProfileSlice";
-import { useAppDispatch, useAppSelector } from "../../store/store";
 
 const Index = () => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
+  const [isSaldoVisible, setIsSaldoVisible] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         await dispatch(fetchProfile());
+        await dispatch(getBanner());
+        await dispatch(getServices());
+        await dispatch(getBalance());
       } catch (error) {
-        console.error("Failed to fetch profile:", error);
+        console.error("Failed to fetch data:", error);
       } finally {
         setLoading(false);
       }
@@ -40,11 +30,13 @@ const Index = () => {
     loadData();
   }, [dispatch]);
 
-  // Safe access to profile state
   const profileState = useAppSelector((state) => state.profile.data);
-  const data = profileState ? profileState.data : null;
+  const getBannerState = useAppSelector((state) => state.banner.banners);
+  const servicesState = useAppSelector((state) => state.services.services);
+  const balanceState = useAppSelector((state) => state.balance);
 
-  const [isSaldoVisible, setIsSaldoVisible] = useState(true);
+  const profileData = profileState ? profileState.data : null;
+  const balance = balanceState.data?.data?.balance ?? null;
   const toggleSaldoVisibility = () => {
     setIsSaldoVisible((prev) => !prev);
   };
@@ -62,11 +54,11 @@ const Index = () => {
             <h1>Selamat Datang</h1>
             {loading ? (
               <p>Loading...</p>
-            ) : data ? (
-              <>
-                <h1 className="font-bold text-3xl">{data.first_name}</h1>
-                <h1 className="font-bold text-3xl">{data.last_name}</h1>
-              </>
+            ) : profileData ? (
+              <div className="flex items-center space-x-2">
+                <h1 className="font-bold text-xl">{profileData.first_name}</h1>
+                <h1 className="font-bold text-xl">{profileData.last_name}</h1>
+              </div>
             ) : (
               <p>No data available</p>
             )}
@@ -82,13 +74,21 @@ const Index = () => {
           <div className="relative z-10 flex flex-col h-full pl-6">
             <h1 className="text-white font-semibold mt-6">Saldo Anda</h1>
             <h1 className="text-white text-4xl font-bold mt-2">
-              {isSaldoVisible ? "Rp 100.000" : "****"}
+              {loading
+                ? "Loading..."
+                : isSaldoVisible
+                ? `Rp ${
+                    typeof balance === "number" ? balance.toLocaleString() : "0"
+                  }`
+                : "****"}
             </h1>
             <button
               onClick={toggleSaldoVisibility}
               className="text-white font-semibold mt-5 flex items-center space-x-2"
             >
-              <span>{isSaldoVisible ? "Lihat Saldo" : "Lihat Saldo"}</span>
+              <span>
+                {isSaldoVisible ? "Sembunyikan Saldo" : "Lihat Saldo"}
+              </span>
               {isSaldoVisible ? (
                 <AiOutlineEyeInvisible className="text-white" />
               ) : (
@@ -99,28 +99,41 @@ const Index = () => {
         </div>
       </div>
 
-      {/* icon */}
+      {/* Services */}
       <div className="flex mt-10 flex-wrap justify-center">
-        <img src={Game} alt="" className="mx-4 mb-4" />
-        <img src={kurban} alt="" className="mx-4 mb-4" />
-        <img src={Listrik} alt="" className="mx-4 mb-4" />
-        <img src={Pdam} alt="" className="mx-4 mb-4" />
-        <img src={makanan} alt="" className="mx-4 mb-4" />
-        <img src={Musik} alt="" className="mx-4 mb-4" />
-        <img src={Paket} alt="" className="mx-4 mb-4" />
-        <img src={PBB} alt="" className="mx-4 mb-4" />
-        <img src={PGN} alt="" className="mx-4 mb-4" />
-        <img src={Pulsa} alt="" className="mx-4 mb-4" />
-        <img src={Televisi} alt="" className="mx-4 mb-4" />
-        <img src={Zakat} alt="" className="mx-4 mb-4" />
+        {servicesState.length > 0 ? (
+          servicesState.map((service) => (
+            <div
+              key={service.service_code}
+              className="mx-4 mb-4 flex flex-col items-center"
+            >
+              <img
+                src={service.service_icon}
+                // alt={service.service_name}
+                className="w-16 h-16"
+              />
+              {/* <h1 className="text-center mt-2">{service.service_name}</h1> */}
+            </div>
+          ))
+        ) : (
+          <p>No services available</p>
+        )}
       </div>
 
-      <div className="flex mt-6">
-        <img src={Ban1} alt="" className="mx-4 mb-4" />
-        <img src={Ban2} alt="" className="mx-4 mb-4" />
-        <img src={Ban3} alt="" className="mx-4 mb-4" />
-        <img src={Ban4} alt="" className="mx-4 mb-4" />
-        <img src={Ban5} alt="" className="mx-4 mb-4" />
+      {/* Banners */}
+      <div className="flex mt-6 flex-wrap justify-center">
+        {getBannerState.length > 0 ? (
+          getBannerState.map((banner) => (
+            <img
+              key={banner.banner_name}
+              src={banner.banner_image}
+              alt={banner.banner_name}
+              className="mx-4 mb-4"
+            />
+          ))
+        ) : (
+          <p>No banners available</p>
+        )}
       </div>
     </div>
   );
