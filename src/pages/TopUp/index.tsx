@@ -5,9 +5,12 @@ import { fetchProfile } from "../../store/slice/getProfileSlice";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { getBalance } from "../../store/slice/getBalanceSlice";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [isSaldoVisible, setIsSaldoVisible] = useState(true);
   const [topUpAmount, setTopUpAmount] = useState("");
@@ -15,6 +18,9 @@ const Index = () => {
   const data = profileState ? profileState.data : null;
   const balanceState = useAppSelector((state) => state.balance);
   const balance = balanceState.data?.data?.balance ?? null;
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -33,12 +39,37 @@ const Index = () => {
     setIsSaldoVisible((prevState) => !prevState);
   };
 
-  const handleInputChange = (e: any) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTopUpAmount(e.target.value);
   };
 
   const handleButtonClick = (amount: string) => {
     setTopUpAmount(amount);
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSuccessMessage(null);
+    setErrorMessage(null);
+
+    try {
+      const response = await axios.post(
+        "https://take-home-test-api.nutech-integrasi.com/topup",
+        { top_up_amount: topUpAmount },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log("Top-up successful:", response.data);
+      setSuccessMessage("Top-up berhasil!");
+      await dispatch(getBalance());
+      navigate("/topup");
+    } catch (error) {
+      console.error("Top-up failed:", error);
+      setErrorMessage("Top-up gagal. Silakan coba lagi.");
+    }
   };
 
   return (
@@ -99,40 +130,59 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="ml-5 mt-4">
+      <form onSubmit={handleSubmit} className="ml-5 mt-4">
         <h1>Silahkan Masukan</h1>
         <h1 className="font-bold text-3xl">Nominal Top Up</h1>
-      </div>
-      <div className="flex mt-10 flex-wrap justify-center">
-        <div className="flex flex-col mx-4" style={{ flexBasis: "60%" }}>
-          <input
-            type="number"
-            value={topUpAmount}
-            onChange={handleInputChange}
-            placeholder="Masukkan Nominal Top up"
-            className="mb-4 w-full px-3 py-2 border rounded-md border-gray-300"
-          />
-          <button className="bg-gray-400 text-white w-full py-2 rounded-md mb-2 hover:bg-gray-700">
-            Top Up
-          </button>
-        </div>
-        <div
-          className="flex flex-wrap justify-between"
-          style={{ width: "390px" }}
-        >
-          {["10.000", "20.000", "50.000", "100.000", "250.000", "500.000"].map(
-            (amount) => (
-              <button
-                key={amount}
-                onClick={() => handleButtonClick(amount)}
-                className="border border-gray-500 text-gray-500 w-32 py-2 h-11 rounded-md mb-2 hover:bg-gray-200"
-              >
-                Rp. {amount}
-              </button>
-            )
+
+        {/* Pesan Keberhasilan atau Kesalahan */}
+        <div className="flex mt-4 flex-wrap justify-center">
+          {successMessage && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+              {successMessage}
+            </div>
+          )}
+          {errorMessage && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+              {errorMessage}
+            </div>
           )}
         </div>
-      </div>
+
+        <div className="flex mt-10 flex-wrap justify-center">
+          <div className="flex flex-col mx-4" style={{ flexBasis: "60%" }}>
+            <input
+              type="number"
+              value={topUpAmount}
+              onChange={handleInputChange}
+              placeholder="Masukkan Nominal Top up"
+              className="mb-4 w-full px-3 py-2 border rounded-md border-gray-300"
+            />
+            <button
+              type="submit"
+              className="bg-gray-400 text-white w-full py-2 rounded-md mb-2 hover:bg-gray-700"
+            >
+              Top Up
+            </button>
+          </div>
+          <div
+            className="flex flex-wrap justify-between"
+            style={{ width: "390px" }}
+          >
+            {["10000", "20000", "50000", "100000", "250000", "500000"].map(
+              (amount) => (
+                <button
+                  key={amount}
+                  type="button"
+                  onClick={() => handleButtonClick(amount)}
+                  className="border border-gray-500 text-gray-500 w-32 py-2 h-11 rounded-md mb-2 hover:bg-gray-200"
+                >
+                  Rp. {amount}
+                </button>
+              )
+            )}
+          </div>
+        </div>
+      </form>
     </div>
   );
 };

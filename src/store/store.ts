@@ -5,6 +5,7 @@ import getProfileReducer from "./slice/getProfileSlice";
 import getBannerReducer from "./slice/getBannerSlice";
 import getServicesReducer from "./slice/getServicesSlice";
 import getBalanceReducer from "./slice/getBalanceSlice";
+import getTransactionReducer from "./slice/getTransactionSlice";
 
 const store = configureStore({
     reducer: {
@@ -13,6 +14,7 @@ const store = configureStore({
         banner: getBannerReducer,
         services: getServicesReducer,
         balance: getBalanceReducer,
+        transaction: getTransactionReducer
     }
 });
 

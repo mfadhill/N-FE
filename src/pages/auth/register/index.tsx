@@ -32,7 +32,6 @@ function Register() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    // Basic validation
     if (
       !formData.email ||
       !formData.first_name ||
@@ -44,12 +43,10 @@ function Register() {
       return;
     }
 
-    // Password confirmation check
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
-
     try {
       const response = await axios.post(
         "https://take-home-test-api.nutech-integrasi.com/registration",

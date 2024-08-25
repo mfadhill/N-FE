@@ -3,17 +3,21 @@ import profile from "../../assets/profile.png";
 import { MdOutlineModeEdit } from "react-icons/md";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { fetchProfile } from "../../store/slice/getProfileSlice";
+import axios from "axios";
 
 const Index = () => {
   const [email, setEmail] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [profilePic, setProfilePic] = useState<string>(profile);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dispatch = useAppDispatch();
   const profileState = useAppSelector((state) => state.profile.data);
   const data = profileState ? profileState.data : null;
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -39,9 +43,30 @@ const Index = () => {
     }
   }, [data]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ email, firstName, lastName });
+    setSuccessMessage(null); // Clear previous success message
+    setErrorMessage(null); // Clear previous error message
+
+    try {
+      const response = await axios.put(
+        "https://take-home-test-api.nutech-integrasi.com/profile/update",
+        {
+          first_name: firstName,
+          last_name: lastName,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log("Profile update successful:", response.data);
+      setSuccessMessage("Profile berhasil diperbarui!");
+    } catch (error) {
+      console.error("Profile update failed:", error);
+      setErrorMessage("Update profile gagal. Silakan coba lagi.");
+    }
   };
 
   const handlePhotoClick = () => {
@@ -92,11 +117,11 @@ const Index = () => {
           </label>
           <input
             id="email"
-            type="email"
+            type="text"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
             required
+            disabled
           />
         </div>
         <div>
@@ -126,11 +151,54 @@ const Index = () => {
           />
         </div>
         <button
-          type="button"
-          className="bg-red-500 text-white px-4 py-2 rounded-md w-full hover:bg-red-900"
+          type="submit"
+          className="bg-red-500 text-white px-4 py-2 rounded-md w-full hover:bg-red-700"
         >
           Simpan
         </button>
+        {/* Pesan Keberhasilan atau Kesalahan */}
+        {successMessage && (
+          <div className="bg-green-50 border border-green-300 text-green-800 px-4 py-3 rounded-md shadow-md mt-4">
+            <div className="flex items-center">
+              <svg
+                className="w-6 h-6 text-green-500 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              <span>{successMessage}</span>
+            </div>
+          </div>
+        )}
+        {errorMessage && (
+          <div className="bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-md shadow-md mt-4">
+            <div className="flex items-center">
+              <svg
+                className="w-6 h-6 text-red-500 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+              <span>{errorMessage}</span>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );

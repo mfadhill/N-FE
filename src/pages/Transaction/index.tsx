@@ -4,6 +4,7 @@ import psaldo from "../../assets/saldo.png";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { fetchProfile } from "../../store/slice/getProfileSlice";
 import { getBalance } from "../../store/slice/getBalanceSlice";
+import { getTransactions } from "../../store/slice/getTransactionSlice"; // Import your thunk
 import { useAppDispatch, useAppSelector } from "../../store/store";
 
 const Index = () => {
@@ -13,11 +14,18 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const balanceState = useAppSelector((state) => state.balance);
   const balance = balanceState.data?.data?.balance ?? null;
+  const profileState = useAppSelector((state) => state.profile.data);
+  const data = profileState ? profileState.data : null;
+  const transactionState = useAppSelector((state) => state.transaction);
+  const transactions = transactionState.records;
+  const isLoadingTransactions = transactionState.status === "loading";
+
   useEffect(() => {
     const loadData = async () => {
       try {
         await dispatch(fetchProfile());
         await dispatch(getBalance());
+        await dispatch(getTransactions()); // Fetch transactions
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
@@ -27,60 +35,6 @@ const Index = () => {
 
     loadData();
   }, [dispatch]);
-
-  const profileState = useAppSelector((state) => state.profile.data);
-  const data = profileState ? profileState.data : null;
-
-  const transactions = [
-    {
-      amount: "Rp. 10.000",
-      description: "Top Up Pulsa Listrik",
-      date: "24 August 2024",
-      type: "in",
-    },
-    {
-      amount: "Rp. 20.000",
-      description: "Pembelian Barang",
-      date: "24 August 2024",
-      type: "out",
-    },
-    {
-      amount: "Rp. 20.000",
-      description: "Pembelian Barang",
-      date: "24 August 2024",
-      type: "out",
-    },
-    {
-      amount: "Rp. 20.000",
-      description: "Pembelian Barang",
-      date: "24 August 2024",
-      type: "out",
-    },
-    {
-      amount: "Rp. 20.000",
-      description: "Pembelian Barang",
-      date: "24 August 2024",
-      type: "out",
-    },
-    {
-      amount: "Rp. 15.000",
-      description: "Top Up Pulsa Listrik",
-      date: "23 August 2024",
-      type: "in",
-    },
-    {
-      amount: "Rp. 25.000",
-      description: "Pembayaran Tagihan",
-      date: "23 August 2024",
-      type: "out",
-    },
-    {
-      amount: "Rp. 50.000",
-      description: "Pembayaran Tagihan",
-      date: "26 August 2024",
-      type: "out",
-    },
-  ];
 
   const handleShowMore = () => {
     setVisibleCount((prevCount) =>
@@ -153,28 +107,37 @@ const Index = () => {
       <div className="ml-5 mt-8">
         <h1 className="font-bold text-xl">Semua Transaction</h1>
         <div className="mt-4 space-y-2">
-          {transactions.slice(0, visibleCount).map((transaction, index) => (
-            <div
-              key={index}
-              className="border border-gray-300 rounded-md py-2 px-4"
-            >
-              <div className="flex justify-between items-center">
-                <span
-                  className={`font-bold text-xl ${
-                    transaction.type === "in"
-                      ? "text-green-500"
-                      : "text-red-500"
-                  }`}
-                >
-                  {transaction.type === "in" ? "+" : "-"} {transaction.amount}
-                </span>
-                <small className="text-black text-sm font-bold">
-                  {transaction.description}
-                </small>
+          {isLoadingTransactions ? (
+            <p>Loading transactions...</p>
+          ) : transactions.length === 0 ? (
+            <p>No transactions available</p>
+          ) : (
+            transactions.slice(0, visibleCount).map((transaction, index) => (
+              <div
+                key={index}
+                className="border border-gray-300 rounded-md py-2 px-4"
+              >
+                <div className="flex justify-between items-center">
+                  <span
+                    className={`font-bold text-xl ${
+                      transaction.transaction_type === "TOPUP"
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }`}
+                  >
+                    {transaction.transaction_type === "TOPUP" ? "+" : "-"}{" "}
+                    {transaction.total_amount.toLocaleString()}
+                  </span>
+                  <small className="text-black text-sm font-bold">
+                    {transaction.description}
+                  </small>
+                </div>
+                <div className="text-gray-500 text-sm">
+                  {new Date(transaction.created_on).toLocaleDateString()}
+                </div>
               </div>
-              <div className="text-gray-500 text-sm">{transaction.date}</div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
         {visibleCount < transactions.length && (
           <div className="flex justify-center mt-4">

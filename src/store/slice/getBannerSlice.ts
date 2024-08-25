@@ -32,7 +32,7 @@ export const getBanner = createAsyncThunk<
 
         });
         console.log(data.data);
-        return data.data; // Adjust if necessary based on the actual response structure
+        return data.data;
     } catch (error) {
         return rejectWithValue("Failed to fetch banners");
     }
