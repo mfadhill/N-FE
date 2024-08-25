@@ -2,7 +2,7 @@ import { RouteObject } from "react-router-dom";
 import RootLayout from "../layout/RootLayout";
 import Home from "../pages/Home";
 import Topup from "../pages/TopUp";
-import Topupnew from "../pages/TopUp/topup";
+import Services from "../pages/Services";
 import Transaction from "../pages/Transaction";
 import Akun from "../pages/Akun";
 import Login from "../pages/auth/login";
@@ -24,8 +24,8 @@ const routes: RouteObject[] = [
         element: <Topup />,
       },
       {
-        path: "/topup/new",
-        element: <Topupnew />,
+        path: "/services",
+        element: <Services />,
       },
       {
         path: "/transaction",

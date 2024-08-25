@@ -1,4 +1,3 @@
-// servicesSlice.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -11,14 +10,16 @@ interface Service {
 
 interface ServicesState {
     services: Service[];
+    selectedService: Service | null;
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
 }
 
 const initialState: ServicesState = {
     services: [],
+    selectedService: null,
     status: "idle",
-    error: null
+    error: null,
 };
 
 export const getServices = createAsyncThunk<
@@ -41,7 +42,11 @@ export const getServices = createAsyncThunk<
 const servicesSlice = createSlice({
     name: "services",
     initialState,
-    reducers: {},
+    reducers: {
+        setSelectedService(state, action) {
+            state.selectedService = action.payload; // Reducer untuk mengatur layanan yang dipilih
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(getServices.pending, (state) => {
@@ -57,5 +62,7 @@ const servicesSlice = createSlice({
             });
     }
 });
+
+export const { setSelectedService } = servicesSlice.actions;
 
 export default servicesSlice.reducer;

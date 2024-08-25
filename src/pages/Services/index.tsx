@@ -1,19 +1,49 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import profile from "../../assets/profile.png";
 import psaldo from "../../assets/saldo.png";
-import listrik from "../../assets/icon/Listrik.png";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FaMoneyCheckDollar } from "react-icons/fa6";
+import { getBalance } from "../../store/slice/getBalanceSlice";
+import { fetchProfile } from "../../store/slice/getProfileSlice";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 
-const Index = () => {
+const Index: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const [loading, setLoading] = useState(true);
   const [isSaldoVisible, setIsSaldoVisible] = useState(true);
+  const profileState = useAppSelector((state) => state.profile.data);
+  const balanceState = useAppSelector((state) => state.balance);
+  const profileData = profileState ? profileState.data : null;
+  const balance = balanceState.data?.data?.balance ?? null;
+
+  const selectedService = useAppSelector(
+    (state) => state.services.selectedService
+  );
+
+  if (!selectedService) {
+    return <p>No service selected</p>;
+  }
 
   const toggleSaldoVisibility = () => {
     setIsSaldoVisible((prevState) => !prevState);
   };
 
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        await dispatch(fetchProfile());
+        await dispatch(getBalance());
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [dispatch]);
+
   return (
-    <div className="mt-4 mx-auto max-w-7xl">
+    <div className="mt-4 mx-auto max-w-7xl px-4">
       <div className="flex justify-center items-center space-x-4">
         <div className="flex-1 h-40 flex flex-col items-start pl-6 pt-2">
           <img
@@ -22,8 +52,17 @@ const Index = () => {
             className="w-16 h-16 rounded-full object-cover border-4 border-white ml-8"
           />
           <div className="mt-4 text-center">
-            <h1 className="text-lg">Selamat Datang</h1>
-            <h1 className="font-bold text-3xl">Kristina Wibowo</h1>
+            <h1 className="text-2xl font-semibold">Selamat Datang</h1>
+            {loading ? (
+              <p>Loading...</p>
+            ) : profileData ? (
+              <div className="flex items-center space-x-2">
+                <h1 className="font-bold text-xl">{profileData.first_name}</h1>
+                <h1 className="font-bold text-xl">{profileData.last_name}</h1>
+              </div>
+            ) : (
+              <p>No data available</p>
+            )}
           </div>
         </div>
 
@@ -36,7 +75,13 @@ const Index = () => {
           <div className="relative z-10 flex flex-col h-full pl-6">
             <h1 className="text-white font-semibold mt-6">Saldo Anda</h1>
             <h1 className="text-white text-4xl font-bold mt-2">
-              {isSaldoVisible ? "Rp 100.000" : "****"}
+              {loading
+                ? "Loading..."
+                : isSaldoVisible
+                ? `Rp ${
+                    typeof balance === "number" ? balance.toLocaleString() : "0"
+                  }`
+                : "****"}
             </h1>
             <button
               onClick={toggleSaldoVisibility}
@@ -57,9 +102,18 @@ const Index = () => {
 
       <div className="ml-5 mt-4">
         <h1 className="text-xl font-semibold">Pembayaran</h1>
-        <div className="flex items-center mt-4">
-          <img src={listrik} alt="Listrik Icon" height={50} width={50} />
-          <h1 className="font-bold mx-4 text-xl">Nominal Top Up</h1>
+        <div className="mt-2 p-4 border border-gray-300 rounded-lg">
+          <h2 className="text-lg font-medium">
+            {selectedService.service_name}
+          </h2>
+          <img
+            src={selectedService.service_icon}
+            alt={selectedService.service_name}
+            className="w-16 h-16 mt-2"
+          />
+          <p className="text-sm">
+            Tariff: Rp {selectedService.service_tariff.toLocaleString()}
+          </p>
         </div>
       </div>
 

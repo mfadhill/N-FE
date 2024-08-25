@@ -2,16 +2,43 @@ import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { fetchProfile } from "../../store/slice/getProfileSlice";
 import { getBanner } from "../../store/slice/getBannerSlice";
-import { getServices } from "../../store/slice/getServicesSlice";
+import {
+  getServices,
+  setSelectedService,
+} from "../../store/slice/getServicesSlice";
 import { getBalance } from "../../store/slice/getBalanceSlice";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import profile from "../../assets/profile.png";
 import psaldo from "../../assets/saldo.png";
+import { Link } from "react-router-dom";
 
-const Index = () => {
+const Index: React.FC = () => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
   const [isSaldoVisible, setIsSaldoVisible] = useState(true);
+
+  const SERVICE_ICON: { [key: string]: string } = {
+    PAJAK: "/icon/PBB.png",
+    PLN: "/icon/Listrik.png",
+    PDAM: "/icon/PDAM.png",
+    PULSA: "/icon/Pulsa.png",
+    PGN: "/icon/PGN.png",
+    MUSIK: "/icon/Musik.png",
+    TV: "/icon/Televisi.png",
+    PAKET_DATA: "/icon/paket.png",
+    VOUCHER_GAME: "/icon/Game.png",
+    VOUCHER_MAKANAN: "/icon/makanan.png",
+    QURBAN: "/icon/Kurban.png",
+    ZAKAT: "/icon/Zakat.png",
+  };
+
+  const BANNER_NAME: { [key: string]: string } = {
+    "Banner 1": "/banner/Banner1.png",
+    "Banner 2": "/banner/Banner2.png",
+    "Banner 3": "/banner/Banner3.png",
+    "Banner 4": "/banner/Banner4.png",
+    "Banner 5": "/banner/Banner5.png",
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -30,6 +57,10 @@ const Index = () => {
     loadData();
   }, [dispatch]);
 
+  const handleClick = (service: Service) => {
+    dispatch(setSelectedService(service));
+  };
+
   const profileState = useAppSelector((state) => state.profile.data);
   const getBannerState = useAppSelector((state) => state.banner.banners);
   const servicesState = useAppSelector((state) => state.services.services);
@@ -37,6 +68,7 @@ const Index = () => {
 
   const profileData = profileState ? profileState.data : null;
   const balance = balanceState.data?.data?.balance ?? null;
+
   const toggleSaldoVisibility = () => {
     setIsSaldoVisible((prev) => !prev);
   };
@@ -105,14 +137,25 @@ const Index = () => {
           servicesState.map((service) => (
             <div
               key={service.service_code}
-              className="mx-4 mb-4 flex flex-col items-center"
+              className="mx-2 flex flex-col items-center w-20"
             >
-              <img
-                src={service.service_icon}
-                // alt={service.service_name}
-                className="w-16 h-16"
-              />
-              {/* <h1 className="text-center mt-2">{service.service_name}</h1> */}
+              <Link to="/services">
+                <button
+                  onClick={() => handleClick(service)}
+                  className="flex flex-col items-center justify-center"
+                >
+                  <img
+                    src={
+                      SERVICE_ICON[service.service_code] || service.service_icon
+                    }
+                    alt={service.service_name}
+                    className="w-14 h-14"
+                  />
+                  <h1 className="text-center text-sm">
+                    {service.service_name}
+                  </h1>
+                </button>
+              </Link>
             </div>
           ))
         ) : (
@@ -121,12 +164,13 @@ const Index = () => {
       </div>
 
       {/* Banners */}
+      <h1 className="font-semibold text-xl mx-4 my-4">Temukan Promo Menarik</h1>
       <div className="flex mt-6 flex-wrap justify-center">
         {getBannerState.length > 0 ? (
           getBannerState.map((banner) => (
             <img
-              key={banner.banner_name}
-              src={banner.banner_image}
+              key={banner.banner_image}
+              src={BANNER_NAME[banner.banner_name]}
               alt={banner.banner_name}
               className="mx-4 mb-4"
             />

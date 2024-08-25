@@ -25,7 +25,7 @@ const Index = () => {
       try {
         await dispatch(fetchProfile());
         await dispatch(getBalance());
-        await dispatch(getTransactions()); // Fetch transactions
+        await dispatch(getTransactions());
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
@@ -36,7 +36,10 @@ const Index = () => {
     loadData();
   }, [dispatch]);
 
+  console.log("Visible Count:", visibleCount);
+  console.log("Total Transactions:", transactions.length);
   const handleShowMore = () => {
+    console.log("Handle Show More clicked");
     setVisibleCount((prevCount) =>
       Math.min(prevCount + 5, transactions.length)
     );

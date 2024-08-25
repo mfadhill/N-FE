@@ -14,7 +14,7 @@ const store = configureStore({
         banner: getBannerReducer,
         services: getServicesReducer,
         balance: getBalanceReducer,
-        transaction: getTransactionReducer
+        transaction: getTransactionReducer,
     }
 });
 
