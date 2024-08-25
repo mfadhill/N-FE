@@ -11,6 +11,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import profile from "../../assets/profile.png";
 import psaldo from "../../assets/saldo.png";
 import { Link } from "react-router-dom";
+import "../../App.css";
 
 const Index: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -165,14 +166,14 @@ const Index: React.FC = () => {
 
       {/* Banners */}
       <h1 className="font-semibold text-xl mx-4 my-4">Temukan Promo Menarik</h1>
-      <div className="flex mt-6 flex-wrap justify-center">
+      <div className="flex mt-6 flex-nowrap overflow-x-auto justify-start space-x-4 scrollbar-hide">
         {getBannerState.length > 0 ? (
           getBannerState.map((banner) => (
             <img
               key={banner.banner_image}
               src={BANNER_NAME[banner.banner_name]}
               alt={banner.banner_name}
-              className="mx-4 mb-4"
+              className="flex-shrink-0 mb-4"
             />
           ))
         ) : (

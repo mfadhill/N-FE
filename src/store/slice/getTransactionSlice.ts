@@ -28,14 +28,18 @@ const initialState: TransactionState = {
 
 export const getTransactions = createAsyncThunk<
     { records: Transaction[]; offset: number; limit: number },
-    void,
+    { offset: number; limit: number }, // Accept offset and limit as parameters
     { rejectValue: string }
->("transaction/getTransactions", async (_, { rejectWithValue }) => {
+>("transaction/getTransactions", async ({ offset, limit }, { rejectWithValue }) => {
     try {
         const response = await axios.get("https://take-home-test-api.nutech-integrasi.com/transaction/history", {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`
-            }
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            params: {
+                limit: limit || 5, // Use the provided limit
+                offset: offset || 0, // Use the provided offset
+            },
         });
         return response.data.data;
     } catch (error) {
@@ -54,7 +58,7 @@ const transactionSlice = createSlice({
             })
             .addCase(getTransactions.fulfilled, (state, action) => {
                 state.status = "succeeded";
-                state.records = action.payload.records;
+                state.records = [...state.records, ...action.payload.records];
                 state.offset = action.payload.offset;
                 state.limit = action.payload.limit;
             })

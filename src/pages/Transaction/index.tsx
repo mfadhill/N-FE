@@ -8,9 +8,10 @@ import { getTransactions } from "../../store/slice/getTransactionSlice";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 
 const Index = () => {
-  const [visibleCount, setVisibleCount] = useState(5);
-  const [isSaldoVisible, setIsSaldoVisible] = useState(true);
   const dispatch = useAppDispatch();
+  const limit = 5;
+  const [offset, setOffset] = useState(0);
+  const [isSaldoVisible, setIsSaldoVisible] = useState(true);
   const [loading, setLoading] = useState(true);
   const balanceState = useAppSelector((state) => state.balance);
   const balance = balanceState.data?.data?.balance ?? null;
@@ -25,21 +26,19 @@ const Index = () => {
       try {
         await dispatch(fetchProfile());
         await dispatch(getBalance());
-        await dispatch(getTransactions());
+        await dispatch(getTransactions({ offset, limit: 5 }));
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
         setLoading(false);
       }
     };
-
     loadData();
   }, [dispatch]);
 
   const handleShowMore = () => {
-    setVisibleCount((prevCount) =>
-      Math.min(prevCount + 10, transactions.length)
-    );
+    dispatch(getTransactions({ offset: offset + limit, limit }));
+    setOffset((prev) => prev + limit);
   };
 
   const toggleSaldoVisibility = () => {
@@ -104,7 +103,7 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="ml-5 mt-8">
+      <div className="ml-5 mt-8 pb-10">
         <h1 className="font-bold text-xl">Semua Transaction</h1>
         <div className="mt-4 space-y-2">
           {isLoadingTransactions ? (
@@ -112,7 +111,7 @@ const Index = () => {
           ) : transactions.length === 0 ? (
             <p>No transactions available</p>
           ) : (
-            transactions.slice(0, visibleCount).map((transaction, index) => (
+            transactions.map((transaction, index) => (
               <div
                 key={index}
                 className="border border-gray-300 rounded-md py-2 px-4"
@@ -139,14 +138,12 @@ const Index = () => {
             ))
           )}
         </div>
-        {visibleCount < transactions.length && (
-          <button
-            onClick={handleShowMore}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md justify-center items-center"
-          >
-            Show More
-          </button>
-        )}
+        <button
+          onClick={handleShowMore}
+          className="mt-4 px-4 py-2  text-red-500 font-semibold rounded-md flex mx-auto"
+        >
+          Show More
+        </button>
       </div>
     </div>
   );
