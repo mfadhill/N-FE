@@ -21,7 +21,7 @@ interface TransactionState {
 const initialState: TransactionState = {
     records: [],
     offset: 0,
-    limit: 10,
+    limit: 20,
     status: 'idle',
     error: null
 };

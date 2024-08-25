@@ -51,11 +51,20 @@ const Index = () => {
     event.preventDefault();
     setSuccessMessage(null);
     setErrorMessage(null);
+    const numericAmount = parseInt(topUpAmount, 10);
+
+    if (numericAmount < 10000 || numericAmount > 1000000) {
+      setErrorMessage(
+        "Nominal top up harus antara Rp 10.000 dan Rp 1.000.000."
+      );
+      return;
+    }
 
     try {
       const response = await axios.post(
         "https://take-home-test-api.nutech-integrasi.com/topup",
         { top_up_amount: topUpAmount },
+
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -79,7 +88,7 @@ const Index = () => {
           <img
             src={profile}
             alt="Profile Photo"
-            className="w-16 h-16 rounded-full object-cover border-4 border-white ml-8"
+            className="w-16 h-16 rounded-full object-cover border-4 border-white ml-16"
           />
           <div className="mt-4 text-center">
             <h1>Selamat Datang</h1>
@@ -87,8 +96,8 @@ const Index = () => {
               <p>Loading...</p>
             ) : data ? (
               <div className="flex items-center space-x-2">
-                <h1 className="font-bold text-xl">{data.first_name}</h1>
-                <h1 className="font-bold text-xl">{data.last_name}</h1>
+                <h1 className="font-bold text-3xl">{data.first_name}</h1>
+                <h1 className="font-bold text-3xl">{data.last_name}</h1>
               </div>
             ) : (
               <p>No data available</p>
@@ -134,20 +143,6 @@ const Index = () => {
         <h1>Silahkan Masukan</h1>
         <h1 className="font-bold text-3xl">Nominal Top Up</h1>
 
-        {/* Pesan Keberhasilan atau Kesalahan */}
-        <div className="flex mt-4 flex-wrap justify-center">
-          {successMessage && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-              {successMessage}
-            </div>
-          )}
-          {errorMessage && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-              {errorMessage}
-            </div>
-          )}
-        </div>
-
         <div className="flex mt-10 flex-wrap justify-center">
           <div className="flex flex-col mx-4" style={{ flexBasis: "60%" }}>
             <input
@@ -183,6 +178,19 @@ const Index = () => {
           </div>
         </div>
       </form>
+      {/* Pesan Keberhasilan atau Kesalahan */}
+      <div className="flex mt-4 flex-wrap justify-center">
+        {successMessage && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+            {successMessage}
+          </div>
+        )}
+        {errorMessage && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+            {errorMessage}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

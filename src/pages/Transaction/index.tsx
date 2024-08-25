@@ -4,7 +4,7 @@ import psaldo from "../../assets/saldo.png";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { fetchProfile } from "../../store/slice/getProfileSlice";
 import { getBalance } from "../../store/slice/getBalanceSlice";
-import { getTransactions } from "../../store/slice/getTransactionSlice"; // Import your thunk
+import { getTransactions } from "../../store/slice/getTransactionSlice";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 
 const Index = () => {
@@ -36,12 +36,9 @@ const Index = () => {
     loadData();
   }, [dispatch]);
 
-  console.log("Visible Count:", visibleCount);
-  console.log("Total Transactions:", transactions.length);
   const handleShowMore = () => {
-    console.log("Handle Show More clicked");
     setVisibleCount((prevCount) =>
-      Math.min(prevCount + 5, transactions.length)
+      Math.min(prevCount + 10, transactions.length)
     );
   };
 
@@ -50,13 +47,13 @@ const Index = () => {
   };
 
   return (
-    <div className="mt-4 mx-auto max-w-7xl mb-10">
+    <div className="mt-4 mx-auto max-w-7xl mb-10 h-screen">
       <div className="flex justify-center items-center space-x-4">
         <div className="flex-1 h-40 flex flex-col items-start pl-6 pt-2">
           <img
             src={profile}
             alt="Profile Photo"
-            className="w-16 h-16 rounded-full object-cover border-4 border-white ml-8"
+            className="w-16 h-16 rounded-full object-cover border-4 border-white ml-16"
           />
           <div className="mt-4 text-center">
             <h1>Selamat Datang</h1>
@@ -64,8 +61,8 @@ const Index = () => {
               <p>Loading...</p>
             ) : data ? (
               <div className="flex items-center space-x-2">
-                <h1 className="font-bold text-xl">{data.first_name}</h1>
-                <h1 className="font-bold text-xl">{data.last_name}</h1>
+                <h1 className="font-bold text-3xl">{data.first_name}</h1>
+                <h1 className="font-bold text-3xl">{data.last_name}</h1>
               </div>
             ) : (
               <p>No data available</p>
@@ -143,14 +140,12 @@ const Index = () => {
           )}
         </div>
         {visibleCount < transactions.length && (
-          <div className="flex justify-center mt-4">
-            <button
-              onClick={handleShowMore}
-              className="px-4 py-2 font-bold text-red-500 rounded-md hover:bg-gray-300"
-            >
-              Show More
-            </button>
-          </div>
+          <button
+            onClick={handleShowMore}
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md justify-center items-center"
+          >
+            Show More
+          </button>
         )}
       </div>
     </div>

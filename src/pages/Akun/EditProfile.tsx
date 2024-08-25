@@ -45,8 +45,8 @@ const Index = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSuccessMessage(null); // Clear previous success message
-    setErrorMessage(null); // Clear previous error message
+    setSuccessMessage(null);
+    setErrorMessage(null);
 
     try {
       const response = await axios.put(
@@ -69,6 +69,30 @@ const Index = () => {
     }
   };
 
+  const uploadImage = async (file: File) => {
+    const formData = new FormData();
+    formData.append("profile_image", file);
+
+    try {
+      const response = await axios.put(
+        "https://take-home-test-api.nutech-integrasi.com/profile/image",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("Image upload successful:", response.data);
+      setProfilePic(response.data.profile_image || profile);
+      setSuccessMessage("Profile image berhasil diperbarui!");
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      setErrorMessage("Update profile image gagal. Silakan coba lagi.");
+    }
+  };
+
   const handlePhotoClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -83,6 +107,7 @@ const Index = () => {
         setProfilePic(reader.result as string);
       };
       reader.readAsDataURL(file);
+      uploadImage(file);
     }
   };
 
@@ -91,7 +116,7 @@ const Index = () => {
       <div className="relative flex flex-col items-center mb-4">
         <div className="relative">
           <img
-            src={profilePic}
+            src={profilePic || profile}
             alt="Profile"
             className="w-32 h-32 rounded-full border border-gray-300"
           />
@@ -105,6 +130,8 @@ const Index = () => {
             ref={fileInputRef}
             onChange={handleFileChange}
             className="hidden"
+            name="profile_image"
+            id="profile_image"
             accept="image/*"
           />
         </div>

@@ -80,7 +80,7 @@ const Index: React.FC = () => {
           <img
             src={profile}
             alt="Profile Photo"
-            className="w-16 h-16 rounded-full object-cover border-4 border-white ml-8"
+            className="w-16 h-16 rounded-full object-cover border-4 border-white ml-16"
           />
           <div className="mt-4 text-center">
             <h1>Selamat Datang</h1>
@@ -88,8 +88,8 @@ const Index: React.FC = () => {
               <p>Loading...</p>
             ) : profileData ? (
               <div className="flex items-center space-x-2">
-                <h1 className="font-bold text-xl">{profileData.first_name}</h1>
-                <h1 className="font-bold text-xl">{profileData.last_name}</h1>
+                <h1 className="font-bold text-3xl">{profileData.first_name}</h1>
+                <h1 className="font-bold text-3xl">{profileData.last_name}</h1>
               </div>
             ) : (
               <p>No data available</p>
