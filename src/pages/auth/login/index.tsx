@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import image from "../../../assets/log.png";
 import { CiWallet } from "react-icons/ci";
 import { FaEye, FaEyeSlash } from "react-icons/fa";

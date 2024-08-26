@@ -48,7 +48,7 @@ function Register() {
       return;
     }
     try {
-      const response = await axios.post(
+      await axios.post(
         "https://take-home-test-api.nutech-integrasi.com/registration",
         formData
       );

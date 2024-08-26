@@ -1,18 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../store/store";
-import { fetchProfile } from "../../store/slice/getProfileSlice";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { Link } from "react-router-dom";
+import "../../App.css";
+import profile from "../../assets/profile.png";
+import psaldo from "../../assets/saldo.png";
+import { getBalance } from "../../store/slice/getBalanceSlice";
 import { getBanner } from "../../store/slice/getBannerSlice";
+import { fetchProfile } from "../../store/slice/getProfileSlice";
 import {
   getServices,
   setSelectedService,
 } from "../../store/slice/getServicesSlice";
-import { getBalance } from "../../store/slice/getBalanceSlice";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import profile from "../../assets/profile.png";
-import psaldo from "../../assets/saldo.png";
-import { Link } from "react-router-dom";
-import "../../App.css";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 
+interface Service {
+  service_code: string;
+  service_name: string;
+  service_icon: string;
+  service_tariff: number;
+}
 const Index: React.FC = () => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);

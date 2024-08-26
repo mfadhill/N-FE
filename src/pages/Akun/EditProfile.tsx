@@ -113,10 +113,11 @@ const Index = () => {
 
   return (
     <div className="max-w-xl mx-auto p-4">
+      {loading}
       <div className="relative flex flex-col items-center mb-4">
         <div className="relative">
           <img
-            src={profilePic || profile}
+            src={profile || profilePic}
             alt="Profile"
             className="w-32 h-32 rounded-full border border-gray-300"
           />
