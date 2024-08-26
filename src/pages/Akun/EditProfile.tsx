@@ -4,14 +4,12 @@ import { MdOutlineModeEdit } from "react-icons/md";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { fetchProfile } from "../../store/slice/getProfileSlice";
 import axios from "axios";
-
+import Swal from "sweetalert2";
 const Index = () => {
   const [email, setEmail] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [profilePic, setProfilePic] = useState<string>(profile);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dispatch = useAppDispatch();
@@ -45,30 +43,44 @@ const Index = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSuccessMessage(null);
-    setErrorMessage(null);
+    Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Perubahan profil Anda akan disimpan.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, Simpan!",
+      cancelButtonText: "Batal",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.put(
+            "https://take-home-test-api.nutech-integrasi.com/profile/update",
+            {
+              first_name: firstName,
+              last_name: lastName,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          console.log("Profile update successful:", response.data);
 
-    try {
-      const response = await axios.put(
-        "https://take-home-test-api.nutech-integrasi.com/profile/update",
-        {
-          first_name: firstName,
-          last_name: lastName,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          Swal.fire("Berhasil!", "Profile Anda telah diperbarui.", "success");
+        } catch (error) {
+          console.error("Profile update failed:", error);
+          Swal.fire(
+            "Gagal!",
+            "Update profile Anda gagal. Silakan coba lagi.",
+            "error"
+          );
         }
-      );
-      console.log("Profile update successful:", response.data);
-      setSuccessMessage("Profile berhasil diperbarui!");
-    } catch (error) {
-      console.error("Profile update failed:", error);
-      setErrorMessage("Update profile gagal. Silakan coba lagi.");
-    }
+      }
+    });
   };
-
   const uploadImage = async (file: File) => {
     const formData = new FormData();
     formData.append("profile_image", file);
@@ -86,10 +98,8 @@ const Index = () => {
       );
       console.log("Image upload successful:", response.data);
       setProfilePic(response.data.profile_image || profile);
-      setSuccessMessage("Profile image berhasil diperbarui!");
     } catch (error) {
       console.error("Image upload failed:", error);
-      setErrorMessage("Update profile image gagal. Silakan coba lagi.");
     }
   };
 
@@ -184,49 +194,6 @@ const Index = () => {
         >
           Simpan
         </button>
-        {/* Pesan Keberhasilan atau Kesalahan */}
-        {successMessage && (
-          <div className="bg-green-50 border border-green-300 text-green-800 px-4 py-3 rounded-md shadow-md mt-4">
-            <div className="flex items-center">
-              <svg
-                className="w-6 h-6 text-green-500 mr-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-              <span>{successMessage}</span>
-            </div>
-          </div>
-        )}
-        {errorMessage && (
-          <div className="bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-md shadow-md mt-4">
-            <div className="flex items-center">
-              <svg
-                className="w-6 h-6 text-red-500 mr-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-              <span>{errorMessage}</span>
-            </div>
-          </div>
-        )}
       </form>
     </div>
   );
