@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "../../store/store";
 import { getBalance } from "../../store/slice/getBalanceSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const Index = () => {
   const dispatch = useAppDispatch();
@@ -18,8 +19,6 @@ const Index = () => {
   const data = profileState ? profileState.data : null;
   const balanceState = useAppSelector((state) => state.balance);
   const balance = balanceState.data?.data?.balance ?? null;
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -49,36 +48,53 @@ const Index = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setSuccessMessage(null);
-    setErrorMessage(null);
     const numericAmount = parseInt(topUpAmount, 10);
 
     if (numericAmount < 10000 || numericAmount > 1000000) {
-      setErrorMessage(
-        "Nominal top up harus antara Rp 10.000 dan Rp 1.000.000."
-      );
+      Swal.fire({
+        icon: "error",
+        title: "Wrong Amount",
+        text: "Minimal top-up Rp10.000 dan maksimal Rp1.000.000",
+      });
       return;
     }
 
-    try {
-      const response = await axios.post(
-        "https://take-home-test-api.nutech-integrasi.com/topup",
-        { top_up_amount: topUpAmount },
+    Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: `Anda akan melakukan top-up sebesar Rp ${topUpAmount}.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, Top Up!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.post(
+            "https://take-home-test-api.nutech-integrasi.com/topup",
+            { top_up_amount: topUpAmount },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          console.log("Top-up successful:", response.data);
+          await dispatch(getBalance());
+          navigate("/topup");
 
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          Swal.fire(
+            "Berhasil!",
+            "Top-up Anda telah berhasil dilakukan.",
+            "success"
+          );
+        } catch (error) {
+          console.error("Top-up failed:", error);
+
+          Swal.fire("Gagal!", "Top-up Anda gagal. Silakan coba lagi.", "error");
         }
-      );
-      console.log("Top-up successful:", response.data);
-      setSuccessMessage("Top-up berhasil!");
-      await dispatch(getBalance());
-      navigate("/topup");
-    } catch (error) {
-      console.error("Top-up failed:", error);
-      setErrorMessage("Top-up gagal. Silakan coba lagi.");
-    }
+      }
+    });
   };
 
   return (
@@ -178,19 +194,6 @@ const Index = () => {
           </div>
         </div>
       </form>
-      {/* Pesan Keberhasilan atau Kesalahan */}
-      <div className="flex mt-4 flex-wrap justify-center">
-        {successMessage && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-            {successMessage}
-          </div>
-        )}
-        {errorMessage && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-            {errorMessage}
-          </div>
-        )}
-      </div>
     </div>
   );
 };

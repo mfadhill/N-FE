@@ -7,15 +7,12 @@ import { getBalance } from "../../store/slice/getBalanceSlice";
 import { fetchProfile } from "../../store/slice/getProfileSlice";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import axios from "axios";
-
+import Swal from "sweetalert2";
 const Index: React.FC = () => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
   const [isSaldoVisible, setIsSaldoVisible] = useState(true);
   const [nominal, setNominal] = useState("");
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
   const profileState = useAppSelector((state) => state.profile.data);
   const balanceState = useAppSelector((state) => state.balance);
   const profileData = profileState ? profileState.data : null;
@@ -63,32 +60,51 @@ const Index: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSuccessMessage(null);
-    setErrorMessage(null);
 
-    try {
-      const response = await axios.post(
-        "https://take-home-test-api.nutech-integrasi.com/transaction",
-        {
-          nominal: parseFloat(nominal),
-          service_code: selectedService.service_code,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
+    Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Anda tidak bisa membatalkan transaksi ini!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, bayar!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.post(
+            "https://take-home-test-api.nutech-integrasi.com/transaction",
+            {
+              nominal: parseFloat(nominal),
+              service_code: selectedService.service_code,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          console.log("Transaction successful:", response.data);
+          await dispatch(getBalance());
+
+          Swal.fire(
+            "Berhasil!",
+            "Transaksi Anda telah berhasil dilakukan.",
+            "success"
+          );
+        } catch (error) {
+          console.error("Transaction failed:", error);
+
+          Swal.fire(
+            "Gagal!",
+            "Transaksi Anda gagal. Silakan coba lagi.",
+            "error"
+          );
         }
-      );
-      console.log("Transaction successful:", response.data);
-      setSuccessMessage("Transaction successful!");
-      await dispatch(getBalance());
-    } catch (error) {
-      console.error("Transaction failed:", error);
-      setErrorMessage("Transaction failed. Please try again.");
-    }
+      }
+    });
   };
-
   return (
     <div className="mt-4 mx-auto max-w-7xl px-4">
       <div className="flex justify-center items-center space-x-4">
@@ -186,17 +202,6 @@ const Index: React.FC = () => {
             Bayar
           </button>
         </form>
-        {/* Notification messages */}
-        {successMessage && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded font-bold relative mb-4">
-            {successMessage}
-          </div>
-        )}
-        {errorMessage && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-            {errorMessage}
-          </div>
-        )}
       </div>
     </div>
   );
